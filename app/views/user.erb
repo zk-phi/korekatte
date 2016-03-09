@@ -1,0 +1,48 @@
+<h1>ユーザー情報</h1>
+
+<hr>
+
+<div class="container">
+  <table class="table table-bordered table-hover">
+    <tr><td>ユーザーＩＤ：</td><td><%= e session[:user].name %></td></tr>
+    <tr><td>メールアドレス：</td><td><%= e session[:user].email %></td></tr>
+  </table>
+</div>
+
+<hr>
+
+<h2>参加中のグループ</h2>
+
+<ul class="list-group">
+  <% session[:user].groups.each do |group| %>
+  <a class="list-group-item" href="/group/<%= e group.id %>"><%= e group.name %></a>
+  <% end %>
+</ul>
+
+<hr>
+
+<h2>既存のグループに参加</h2>
+
+<form method="post" action="/user/lookup">
+  <input name="authenticity_token" value="<%= e session[:csrf] %>" type="hidden" />
+  <div class="input-group">
+    <input type="text" name="name" class="form-control" placeholder="グループ名" />
+    <span class="input-group-btn">
+      <button type="submit" class="btn btn-primary">検索</button>
+    </span>
+  </div>
+</form>
+
+<hr>
+
+<h2>グループを作成</h2>
+
+<form method="post" action="/user/organize">
+  <input name="authenticity_token" value="<%= e session[:csrf] %>" type="hidden" />
+  <div class="input-group">
+    <input type="text" name="name" class="form-control" placeholder="グループ名" />
+    <span class="input-group-btn">
+      <button type="submit" class="btn btn-primary">新規作成</button>
+    </span>
+  </div>
+</form>

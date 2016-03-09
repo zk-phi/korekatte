@@ -1,0 +1,13 @@
+<h1>グループ：<%= e @group.name %></h1>
+
+<hr>
+
+<p>
+  このグループのメンバーではありません。
+</p>
+
+<form method="post" action="/group/join">
+  <input name="authenticity_token" value="<%= e session[:csrf] %>" type="hidden" />
+  <input type="hidden" name="group_id" value="<%= e @group.id %>" />
+  <button type="submit" class="btn btn-primary">参加申請を送る</button>
+</form>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>誰かこれ買っといて</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+  </head>
+  <body>
+    <div class="navbar navbar-inverse">
+      <div class="container">
+        <a class="navbar-brand" href="/">誰かこれ買っといて</a>
+        <% if session[:user] %>
+        <ul class="nav navbar-nav navbar-right">
+          <li class="active"><a href="/user"><%= e session[:user].name %></a></li>
+          <li><a href="/log_out">ログアウト</a>
+        </ul>
+        <% end %>
+      </div>
+    </div>
+    <div class="container">
+      <% if @error_msgs %>
+      <div class="alert alert-danger">
+        <ul>
+          <% @error_msgs.each do |message| %>
+          <li><%= e message %></li>
+          <% end %>
+        </ul>
+      </div>
+      <% end %>
+      <%= yield %>
+    </div>
+  </body>
+</html>
