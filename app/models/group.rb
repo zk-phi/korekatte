@@ -9,7 +9,7 @@ class Group < ActiveRecord::Base
 
   # returns all the users in the group as an array
   def members
-    ids = Membership.where(group_id: self.id, pending: false).map! { |m| m.user_id }
+    ids = Membership.where(group_id: self.id, pending: false).map { |m| m.user_id }
     User.where(id: ids)
   end
 

@@ -19,7 +19,7 @@ class User < ActiveRecord::Base
 
   # returns all the group IDs the user joins
   def _group_ids
-    Membership.where(user_id: self.id, pending: false).map! { |m| m.group_id }
+    Membership.where(user_id: self.id, pending: false).map { |m| m.group_id }
   end
 
   # returns all the groups the user joins
