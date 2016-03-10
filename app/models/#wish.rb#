@@ -1,4 +1,4 @@
-require 'active_record'
+urequire 'active_record'
 
 class Wish < ActiveRecord::Base
 

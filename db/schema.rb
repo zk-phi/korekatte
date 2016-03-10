@@ -15,18 +15,22 @@ ActiveRecord::Schema.define(version: 20160308045620) do
 
   create_table "groups", force: true do |t|
     t.string   "name",       null: false
-    t.integer  "owner_id",   null: false
+    t.string   "owner_name", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
+  add_index "groups", ["name"], name: "index_groups_on_name", unique: true
+
   create_table "memberships", force: true do |t|
-    t.integer  "user_id",    null: false
-    t.integer  "group_id",   null: false
+    t.string   "user_name",  null: false
+    t.string   "group_name", null: false
     t.boolean  "pending",    null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "memberships", ["user_name", "group_name"], name: "index_memberships_on_user_name_and_group_name", unique: true
 
   create_table "users", force: true do |t|
     t.string   "name",          null: false
@@ -37,12 +41,14 @@ ActiveRecord::Schema.define(version: 20160308045620) do
     t.datetime "updated_at"
   end
 
+  add_index "users", ["name"], name: "index_users_on_name", unique: true
+
   create_table "wishes", force: true do |t|
     t.string   "text",           null: false
-    t.integer  "group_id",       null: false
-    t.integer  "user_id",        null: false
+    t.string   "group_name",     null: false
+    t.string   "user_name",      null: false
     t.boolean  "active",         null: false
-    t.integer  "deactivated_by"
+    t.string   "deactivated_by"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -15,7 +15,7 @@
 
 <ul class="list-group">
   <% session[:user].groups.each do |group| %>
-  <a class="list-group-item" href="/group/<%= e group.id %>"><%= e group.name %></a>
+  <a class="list-group-item" href="/group/<%= e group.name %>"><%= e group.name %></a>
   <% end %>
 </ul>
 

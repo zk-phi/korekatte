@@ -14,33 +14,37 @@ class User < ActiveRecord::Base
   # returns an User object on success, false otherwise.
   def self.authenticate(name, password)
     user = self.find_by(name: name)
-    user && user.password_hash == BCrypt::Engine.hash_secret(password, user.password_salt) && user
+    if user && user.password_hash == BCrypt::Engine.hash_secret(password, user.password_salt)
+      user
+    else
+      false
+    end
   end
 
   # returns all the group IDs the user joins
-  def _group_ids
-    Membership.where(user_id: self.id, pending: false).map { |m| m.group_id }
+  def _group_names
+    Membership.where(user_name: self.name, pending: false).map { |m| m.group_name }
   end
 
   # returns all the groups the user joins
   def groups
-    Group.where(id: self._group_ids)
+    Group.where(name: self._group_names)
   end
 
   # returns all the wishes assigned to the user
   def wishes
-    Wish.where(group_id: self._group_ids)
+    Wish.where(group_name: self._group_names)
   end
 
   # returns non-nil iff the user owns the group
-  def owner_of?(group_id)
-    group = Group.find(group_id)
-    group && group.owner_id == self.id
+  def owner_of?(group_name)
+    group = Group.find_by(name: group_name)
+    group && group.owner_name == self.name
   end
 
   # returns one of :member :pending or false
-  def join_state(group_id)
-    membership = Membership.find_by(user_id: self.id, group_id: group_id)
+  def join_state(group_name)
+    membership = Membership.find_by(user_name: self.name, group_name: group_name)
     if !membership
       false
     elsif membership.pending

@@ -82,7 +82,7 @@ class Swish < Sinatra::Base
       redirect '/'
     else
       @error_msgs = [ "Authentication failed." ]
-      redirect '/log_in'
+      erb :log_in
     end
   end
 
@@ -102,7 +102,7 @@ class Swish < Sinatra::Base
   post '/user/lookup' do
     group = Group.find_by(name: params[:name])
     if group
-      redirect "/group/#{group.id}"
+      redirect "/group/#{group.name}"
     else
       @error_msgs = [ "No groups found." ]
       erb :user
@@ -111,8 +111,8 @@ class Swish < Sinatra::Base
 
   post '/user/organize' do
     begin
-      group = Group.create!(name: params[:name], owner_id: session[:user].id)
-      Membership.create(user_id: session[:user].id, group_id: group.id, pending: false)
+      group = Group.create!(name: params[:name], owner_name: session[:user].name)
+      Membership.create(user_name: session[:user].name, group_name: group.name, pending: false)
       redirect "/user"
     rescue ActiveRecord::RecordInvalid => e
       @error_msgs = e.record.errors.full_messages
@@ -122,12 +122,12 @@ class Swish < Sinatra::Base
 
   # ----- group
 
-  get '/group/:group_id' do
+  get '/group/:group_name' do
     unless session[:user]
       redirect '/'
     else
-      @group = Group.find(params[:group_id])
-      membership = session[:user].join_state(params[:group_id])
+      @group = Group.find_by(name: params[:group_name])
+      membership = session[:user].join_state(params[:group_name])
       if membership == :member
         erb :group_details
       elsif membership == :pending
@@ -139,34 +139,34 @@ class Swish < Sinatra::Base
   end
 
   post '/group/join' do
-    unless session[:user].join_state(params[:group_id])
-      Membership.create(user_id: session[:user].id, group_id: params[:group_id], pending: true)
+    unless session[:user].join_state(params[:group_name])
+      Membership.create(user_name: session[:user].name, group_name: params[:group_name], pending: true)
     end
-    redirect "/group/#{params[:group_id]}"
+    redirect "/group/#{params[:group_name]}"
   end
 
-  post '/group/remove_member' do
-    membership = Membership.find(params[:membership_id])
-    if session[:user].owner_of?(membership.group_id)
-      membership.destroy
-    end
-    redirect "/group/#{params[:group_id]}"
-  end
+  # post '/group/remove_member' do
+  #   membership = Membership.find(params[:membership_id])
+  #   if session[:user].owner_of?(membership.group_name)
+  #     membership.destroy
+  #   end
+  #   redirect "/group/#{params[:group_name]}"
+  # end
 
   post '/group/accept_request' do
     request = Membership.find(params[:request_id])
-    if session[:user].owner_of?(request.group_id)
+    if session[:user].owner_of?(request.group_name)
       request.update(pending: false)
     end
-    redirect "/group/#{request.group_id}"
+    redirect "/group/#{request.group_name}"
   end
 
   post '/group/reject_request' do
     request = Membership.find(params[:request_id])
-    if session[:user].owner_of?(request.group_id)
+    if session[:user].owner_of?(request.group_name)
       request.destroy
     end
-    redirect "/group/#{request.group_id}"
+    redirect "/group/#{request.group_name}"
   end
 
   # ----- wish
@@ -182,12 +182,12 @@ class Swish < Sinatra::Base
   end
 
   post '/wishes/new' do
-    if session[:user].join_state(params[:group_id]) == :member
+    if session[:user].join_state(params[:group_name]) == :member
       begin
         Wish.create(
           text: params[:text],
-          group_id: params[:group_id],
-          user_id: session[:user].id,
+          group_name: params[:group_name],
+          user_name: session[:user].name,
           active: true,
           deactivated_by: nil
         )
@@ -201,23 +201,23 @@ class Swish < Sinatra::Base
 
   post '/wishes/complete' do
     wish = Wish.find(params[:wish_id])
-    if session[:user].join_state(wish.group_id) == :member
-      wish.update(active: false, deactivated_by: session[:user].id)
+    if session[:user].join_state(wish.group_name) == :member
+      wish.update(active: false, deactivated_by: session[:user].name)
     end
     redirect "/wishes"
   end
 
   post '/wishes/activate' do
     wish = Wish.find(params[:wish_id])
-    if !wish.active && session[:user].join_state(wish.group_id) == :member
-      wish.update(active: true, user_id: session[:user].id)
+    if !wish.active && session[:user].join_state(wish.group_name) == :member
+      wish.update(active: true)
     end
     redirect "/wishes"
   end
 
   post '/wishes/destroy' do
     wish = Wish.find(params[:wish_id])
-    if wish.user_id == session[:user].id
+    if wish.user_name == session[:user].name
       wish.destroy
     end
     redirect "/wishes"

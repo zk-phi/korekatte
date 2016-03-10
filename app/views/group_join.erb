@@ -8,6 +8,6 @@
 
 <form method="post" action="/group/join">
   <input name="authenticity_token" value="<%= e session[:csrf] %>" type="hidden" />
-  <input type="hidden" name="group_id" value="<%= e @group.id %>" />
+  <input type="hidden" name="group_name" value="<%= e @group.name %>" />
   <button type="submit" class="btn btn-primary">参加申請を送る</button>
 </form>

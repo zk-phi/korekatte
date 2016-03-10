@@ -5,17 +5,17 @@
 <h2>メンバー</h2>
 
 <ul class="list-group">
-  <% @group.members.each do |member| %>
+  <% @group.memberships.each do |membership| %>
   <li class="list-group-item">
-    <% if member.id == @group.owner_id %>
+    <% if membership.user_name == @group.owner_name %>
     <span class="btn btn-xs btn-success">オーナー</span>
     <% end %>
-    <%= e member.name %>
+    <%= e membership.user_name %>
   </li>
   <% end %>
 </ul>
 
-<% if session[:user].owner_of?(@group.id) %>
+<% if session[:user].owner_of?(@group.name) %>
 
 <h2>参加申請一覧</h2>
 
@@ -25,7 +25,7 @@
     <tr>
 
       <td>
-        <%= e req.user_id %>
+        <%= e req.user_name %>
       </td>
 
       <td>
