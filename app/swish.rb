@@ -1,3 +1,4 @@
+require 'rack/ssl'
 require 'sinatra/base'
 require 'sinatra/activerecord'
 require 'bcrypt'
@@ -11,6 +12,10 @@ require_relative 'models/wish'
 class Swish < Sinatra::Base
 
   register Sinatra::ActiveRecordExtension
+
+  configure :production do
+    use Rack::SSL
+  end
 
   configure do
     set :public_folder, "#{root}/../public"
